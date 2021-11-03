@@ -37,11 +37,11 @@ sudo systemctl daemon-reload
 5) Enable our service so that it doesn’t get disabled if the server restarts.
 
 
-sudo systemctl enable test.service
+sudo systemctl enable python-server.service
 
 6) Start our service
 
 
-sudo systemctl start test.service
+sudo systemctl start python-server.service
 
 
