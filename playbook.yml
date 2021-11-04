@@ -1,0 +1,60 @@
+---
+  - name: test
+    hosts: all
+    become: yes
+
+    tasks:
+      - name: "apt-get update"
+        apt:
+          update_cache: yes
+          cache_valid_time: 3600
+
+      - name: "install nginx"
+        apt:
+          name: ['nginx']
+          state: latest  
+          
+      - name: "install systemd"
+        apt:
+          name: ['systemd']
+          state: latest     
+    
+    
+    
+      - name: Download nginx reverse-proxy.conf script
+        get_url:
+          url: https://github.com/inTracKas/inTracKas/blob/main/reverse-proxy.conf
+          dest: /etc/nginx/conf.d/reverse-proxy.conf
+          mode: '0440'
+
+
+      - name: Download python-server.py script
+        get_url:
+          url: https://github.com/inTracKas/inTracKas/blob/main/python-server.py
+          dest: /home/python-server.py
+          mode: '0440'
+
+      - name: Download python-server.service script
+        get_url:
+          url: https://github.com/inTracKas/inTracKas/blob/main/python-server.service
+          dest: /etc/systemd/system/python-server.py
+          mode: '0440'
+                 
+      - name: Just force systemd to reread configs (2.4 and above)
+        systemd: daemon_reload=yes
+      
+      - name: Enable service
+        systemd:
+          name: python-server
+          enabled: yes
+          masked: no     
+          
+      - name: restart service python-server in all cases, also issue daemon-reload to pick up config changes
+        systemd:
+          state: restarted
+          daemon_reload: yes
+          name: python-server
+                  
+          
+      - name: Make sure a service is running
+        systemd: state=started name=python-server
